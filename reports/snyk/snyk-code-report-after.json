@@ -1,0 +1,5 @@
+{
+  "ok": false,
+  "error": "net/http: TLS handshake timeout",
+  "path": "/home/tadashi/Desktop/Assignments/swe302_assignments/react-redux-realworld-example-app"
+}

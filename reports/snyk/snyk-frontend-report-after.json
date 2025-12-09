@@ -1,0 +1,283 @@
+{
+  "vulnerabilities": [
+    {
+      "id": "SNYK-JS-DOMPURIFY-8722251",
+      "title": "Cross-site Scripting (XSS)",
+      "CVSSv3": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P",
+      "credit": [
+        "nsysean"
+      ],
+      "semver": {
+        "vulnerable": [
+          "<3.2.4"
+        ]
+      },
+      "exploit": "Proof of Concept",
+      "fixedIn": [
+        "3.2.4"
+      ],
+      "patches": [],
+      "insights": {
+        "triageAdvice": null
+      },
+      "language": "js",
+      "severity": "low",
+      "cvssScore": 2,
+      "functions": [],
+      "malicious": false,
+      "isDisputed": false,
+      "moduleName": "dompurify",
+      "references": [
+        {
+          "url": "https://github.com/cure53/DOMPurify/commit/d18ffcb554e0001748865da03ac75dd7829f0f02",
+          "title": "GitHub Commit"
+        },
+        {
+          "url": "https://github.com/cure53/DOMPurify/releases/tag/3.2.4",
+          "title": "GitHub Release"
+        },
+        {
+          "url": "https://ensy.zip/posts/dompurify-323-bypass/",
+          "title": "Vulnerability Report"
+        }
+      ],
+      "cvssDetails": [
+        {
+          "assigner": "NVD",
+          "severity": "medium",
+          "cvssV3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+          "cvssV3BaseScore": 6.1,
+          "modificationTime": "2025-10-08T01:38:51.757410Z"
+        },
+        {
+          "assigner": "Red Hat",
+          "severity": "medium",
+          "cvssV3Vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:L/I:L/A:N",
+          "cvssV3BaseScore": 4.5,
+          "modificationTime": "2025-02-18T15:26:46.672526Z"
+        }
+      ],
+      "cvssSources": [
+        {
+          "type": "primary",
+          "vector": "CVSS:4.0/AV:L/AC:H/AT:N/PR:N/UI:P/VC:N/VI:N/VA:N/SC:L/SI:L/SA:N/E:P",
+          "assigner": "Snyk",
+          "severity": "low",
+          "baseScore": 2,
+          "cvssVersion": "4.0",
+          "modificationTime": "2025-03-06T07:56:53.987882Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N/E:P",
+          "assigner": "Snyk",
+          "severity": "medium",
+          "baseScore": 4.1,
+          "cvssVersion": "3.1",
+          "modificationTime": "2025-03-06T07:56:53.987882Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N",
+          "assigner": "NVD",
+          "severity": "medium",
+          "baseScore": 6.1,
+          "cvssVersion": "3.1",
+          "modificationTime": "2025-10-08T01:38:51.757410Z"
+        },
+        {
+          "type": "secondary",
+          "vector": "CVSS:3.1/AV:L/AC:H/PR:N/UI:N/S:C/C:L/I:L/A:N",
+          "assigner": "Red Hat",
+          "severity": "medium",
+          "baseScore": 4.5,
+          "cvssVersion": "3.1",
+          "modificationTime": "2025-02-18T15:26:46.672526Z"
+        }
+      ],
+      "description": "## Overview\n[dompurify](https://github.com/cure53/DOMPurify) is a DOM-only XSS sanitizer for HTML, MathML and SVG.\n\nAffected versions of this package are vulnerable to Cross-site Scripting (XSS) due to incorrect handling of template literals in regular expressions. An attacker can manipulate the output of the script by injecting malicious payloads that bypass the `dompurify` sanitization.\n## PoC\n```js\r\nDOMPurify.sanitize(\r\n  `<math><foo-test><mi><li><table><foo-test><li></li></foo-test><a>\r\n      <style>\r\n        <! \\${\r\n      </style>\r\n      }\r\n      <foo-b id=\"><img src onerror='alert(1)'>\">hmm...</foo-b>\r\n    </a></table></li></mi></foo-test></math>\r\n  `,\r\n  {\r\n    SAFE_FOR_TEMPLATES: true,\r\n    CUSTOM_ELEMENT_HANDLING: {\r\n      tagNameCheck: /^foo-/,\r\n    },\r\n  }\r\n);\r\n```\n## Details\n\nCross-site scripting (or XSS) is a code vulnerability that occurs when an attacker “injects” a malicious script into an otherwise trusted website. The injected script gets downloaded and executed by the end user’s browser when the user interacts with the compromised website.\n\nThis is done by escaping the context of the web application; the web application then delivers that data to its users along with other trusted dynamic content, without validating it. The browser unknowingly executes malicious script on the client side (through client-side languages; usually JavaScript or HTML)  in order to perform actions that are otherwise typically blocked by the browser’s Same Origin Policy.\n\nInjecting malicious code is the most prevalent manner by which XSS is exploited; for this reason, escaping characters in order to prevent this manipulation is the top method for securing code against this vulnerability.\n\nEscaping means that the application is coded to mark key characters, and particularly key characters included in user input, to prevent those characters from being interpreted in a dangerous context. For example, in HTML, `<` can be coded as  `&lt`; and `>` can be coded as `&gt`; in order to be interpreted and displayed as themselves in text, while within the code itself, they are used for HTML tags. If malicious content is injected into an application that escapes special characters and that malicious content uses `<` and `>` as HTML tags, those characters are nonetheless not interpreted as HTML tags by the browser if they’ve been correctly escaped in the application code and in this way the attempted attack is diverted.\n \nThe most prominent use of XSS is to steal cookies (source: OWASP HttpOnly) and hijack user sessions, but XSS exploits have been used to expose sensitive information, enable access to privileged services and functionality and deliver malware. \n\n### Types of attacks\nThere are a few methods by which XSS can be manipulated:\n\n|Type|Origin|Description|\n|--|--|--|\n|**Stored**|Server|The malicious code is inserted in the application (usually as a link) by the attacker. The code is activated every time a user clicks the link.|\n|**Reflected**|Server|The attacker delivers a malicious link externally from the vulnerable web site application to a user. When clicked, malicious code is sent to the vulnerable web site, which reflects the attack back to the user’s browser.| \n|**DOM-based**|Client|The attacker forces the user’s browser to render a malicious page. The data in the page itself delivers the cross-site scripting data.|\n|**Mutated**| |The attacker injects code that appears safe, but is then rewritten and modified by the browser, while parsing the markup. An example is rebalancing unclosed quotation marks or even adding quotation marks to unquoted parameters.|\n\n### Affected environments\nThe following environments are susceptible to an XSS attack:\n\n* Web servers\n* Application servers\n* Web application environments\n\n### How to prevent\nThis section describes the top best practices designed to specifically protect your code: \n\n* Sanitize data input in an HTTP request before reflecting it back, ensuring all data is validated, filtered or escaped before echoing anything back to the user, such as the values of query parameters during searches. \n* Convert special characters such as `?`, `&`, `/`, `<`, `>` and spaces to their respective HTML or URL encoded equivalents. \n* Give users the option to disable client-side scripts.\n* Redirect invalid requests.\n* Detect simultaneous logins, including those from two separate IP addresses, and invalidate those sessions.\n* Use and enforce a Content Security Policy (source: Wikipedia) to disable any features that might be manipulated for an XSS attack.\n* Read the documentation for any of the libraries referenced in your code to understand which elements allow for embedded HTML.\n\n## Remediation\nUpgrade `dompurify` to version 3.2.4 or higher.\n## References\n- [GitHub Commit](https://github.com/cure53/DOMPurify/commit/d18ffcb554e0001748865da03ac75dd7829f0f02)\n- [GitHub Release](https://github.com/cure53/DOMPurify/releases/tag/3.2.4)\n- [Vulnerability Report](https://ensy.zip/posts/dompurify-323-bypass/)\n",
+      "epssDetails": {
+        "percentile": "0.08936",
+        "probability": "0.00033",
+        "modelVersion": "v2025.03.14"
+      },
+      "identifiers": {
+        "CVE": [
+          "CVE-2025-26791"
+        ],
+        "CWE": [
+          "CWE-79"
+        ],
+        "GHSA": [
+          "GHSA-vhxf-7vqr-mrjg"
+        ]
+      },
+      "packageName": "dompurify",
+      "proprietary": false,
+      "creationTime": "2025-02-14T09:40:23.681153Z",
+      "functions_new": [],
+      "alternativeIds": [],
+      "disclosureTime": "2025-02-14T08:52:03Z",
+      "exploitDetails": {
+        "sources": [
+          "Snyk"
+        ],
+        "maturityLevels": [
+          {
+            "type": "secondary",
+            "level": "Proof of Concept",
+            "format": "CVSSv3"
+          },
+          {
+            "type": "primary",
+            "level": "Proof of Concept",
+            "format": "CVSSv4"
+          }
+        ]
+      },
+      "packageManager": "npm",
+      "publicationTime": "2025-02-14T09:40:23.928931Z",
+      "severityBasedOn": "CVSS",
+      "modificationTime": "2025-10-08T01:38:51.757410Z",
+      "socialTrendAlert": false,
+      "severityWithCritical": "low",
+      "from": [
+        "react-redux-realworld-example-app@0.1.0",
+        "dompurify@2.5.8"
+      ],
+      "upgradePath": [
+        false,
+        "dompurify@3.2.4"
+      ],
+      "isUpgradable": true,
+      "isPatchable": false,
+      "name": "dompurify",
+      "version": "2.5.8"
+    }
+  ],
+  "ok": false,
+  "dependencyCount": 78,
+  "org": "tadashi-dev-eng",
+  "policy": "# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.\nversion: v1.25.1\nignore: {}\npatch: {}\n",
+  "isPrivate": true,
+  "licensesPolicy": {
+    "severities": {},
+    "orgLicenseRules": {
+      "AGPL-1.0": {
+        "licenseType": "AGPL-1.0",
+        "severity": "high",
+        "instructions": ""
+      },
+      "AGPL-3.0": {
+        "licenseType": "AGPL-3.0",
+        "severity": "high",
+        "instructions": ""
+      },
+      "Artistic-1.0": {
+        "licenseType": "Artistic-1.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "Artistic-2.0": {
+        "licenseType": "Artistic-2.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "CDDL-1.0": {
+        "licenseType": "CDDL-1.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "CPOL-1.02": {
+        "licenseType": "CPOL-1.02",
+        "severity": "high",
+        "instructions": ""
+      },
+      "EPL-1.0": {
+        "licenseType": "EPL-1.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "GPL-2.0": {
+        "licenseType": "GPL-2.0",
+        "severity": "high",
+        "instructions": ""
+      },
+      "GPL-3.0": {
+        "licenseType": "GPL-3.0",
+        "severity": "high",
+        "instructions": ""
+      },
+      "LGPL-2.0": {
+        "licenseType": "LGPL-2.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "LGPL-2.1": {
+        "licenseType": "LGPL-2.1",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "LGPL-3.0": {
+        "licenseType": "LGPL-3.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "MPL-1.1": {
+        "licenseType": "MPL-1.1",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "MPL-2.0": {
+        "licenseType": "MPL-2.0",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "MS-RL": {
+        "licenseType": "MS-RL",
+        "severity": "medium",
+        "instructions": ""
+      },
+      "SimPL-2.0": {
+        "licenseType": "SimPL-2.0",
+        "severity": "high",
+        "instructions": ""
+      }
+    }
+  },
+  "packageManager": "npm",
+  "projectId": "95b8e3b9-e022-49f2-964e-9d994297a036",
+  "ignoreSettings": {
+    "adminOnly": false,
+    "reasonRequired": false,
+    "disregardFilesystemIgnores": false
+  },
+  "summary": "1 vulnerable dependency path",
+  "remediation": {
+    "unresolved": [],
+    "upgrade": {
+      "dompurify@2.5.8": {
+        "upgradeTo": "dompurify@3.2.4",
+        "upgrades": [
+          "dompurify@2.5.8"
+        ],
+        "vulns": [
+          "SNYK-JS-DOMPURIFY-8722251"
+        ]
+      }
+    },
+    "patch": {},
+    "ignore": {},
+    "pin": {}
+  },
+  "filesystemPolicy": false,
+  "filtered": {
+    "ignore": [],
+    "patch": []
+  },
+  "uniqueCount": 1,
+  "projectName": "react-redux-realworld-example-app",
+  "displayTargetFile": "package-lock.json",
+  "hasUnknownVersions": false,
+  "path": "/home/tadashi/Desktop/Assignments/swe302_assignments/react-redux-realworld-example-app"
+}
