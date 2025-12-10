@@ -44,15 +44,6 @@ jobs:
               sed -i "s|${module}/||g" coverage.out || true
             fi
           fi
-
-      - name: Convert Go test JSON to JUnit XML
-        run: |
-          # Convert go test -json to JUnit XML so SonarCloud can import test execution and failure info
-          export PATH=$(go env GOPATH)/bin:$PATH
-          go install github.com/jstemmer/go-junit-report@latest || true
-          if [ -f test-report.json ]; then
-            cat test-report.json | go-junit-report > junit-report.xml || true
-          fi
       
       - name: Show generated coverage artifacts (backend)
         run: |
@@ -73,7 +64,7 @@ jobs:
             -Dsonar.tests=.
             -Dsonar.test.inclusions=**/*_test.go
             -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.junit.reportPaths=junit-report.xml
+            -Dsonar.go.tests.reportPaths=test-report.json
 
   sonarcloud-frontend:
     name: SonarCloud Frontend (React)
@@ -101,13 +92,9 @@ jobs:
           echo "Listing coverage files:" && ls -la coverage || true
         continue-on-error: true
       
-      - name: Ensure frontend lcov exists
+      - name: Show generated coverage artifacts (frontend)
         run: |
-          mkdir -p coverage || true
-          if [ ! -f coverage/lcov.info ] || [ ! -s coverage/lcov.info ]; then
-            echo "Generating placeholder lcov.info"
-            printf "TN:\nSF:src/dummy.js\nDA:1,0\nend_of_record\n" > coverage/lcov.info || true
-          fi
+          echo "Coverage files (frontend):" && ls -la coverage/lcov.info || true
 
       - name: SonarCloud Scan for Frontend
         uses: SonarSource/sonarcloud-github-action@master
