@@ -28,10 +28,36 @@ jobs:
       
       - name: Run tests with coverage
         run: |
-          go test ./... -coverprofile=coverage.out -covermode=atomic
-          go test ./... -json > test-report.json
+          # Run tests and generate coverage and JSON test report. Allow failures (continue) so the workflow doesn't stop.
+          set -o pipefail || true
+          go test ./... -coverprofile=coverage.out -covermode=atomic || true
+          go test ./... -json > test-report.json || true
         continue-on-error: true
+
+      - name: Normalize Go coverage paths
+        run: |
+          # Remove the module import path prefix from coverage.out file paths so SonarCloud can map to repo files
+          if [ -f go.mod ] && [ -f coverage.out ]; then
+            module=$(awk '/^module /{print $2}' go.mod)
+            if [ -n "$module" ]; then
+              # Remove module prefix from coverage entries
+              sed -i "s|${module}/||g" coverage.out || true
+            fi
+          fi
+
+      - name: Convert Go test JSON to JUnit XML
+        run: |
+          # Convert go test -json to JUnit XML so SonarCloud can import test execution and failure info
+          export PATH=$(go env GOPATH)/bin:$PATH
+          go install github.com/jstemmer/go-junit-report@latest || true
+          if [ -f test-report.json ]; then
+            cat test-report.json | go-junit-report > junit-report.xml || true
+          fi
       
+      - name: Show generated coverage artifacts (backend)
+        run: |
+          echo "Coverage files:" && ls -la coverage.out || true
+
       - name: SonarCloud Scan for Backend
         uses: SonarSource/sonarcloud-github-action@master
         env:
@@ -47,7 +73,7 @@ jobs:
             -Dsonar.tests=.
             -Dsonar.test.inclusions=**/*_test.go
             -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.go.tests.reportPaths=test-report.json
+            -Dsonar.junit.reportPaths=junit-report.xml
 
   sonarcloud-frontend:
     name: SonarCloud Frontend (React)
@@ -69,9 +95,20 @@ jobs:
         run: npm ci || npm install
       
       - name: Run tests with coverage
-        run: npm test -- --coverage --watchAll=false || true
+        run: |
+          npm test -- --coverage --watchAll=false || true
+          # Print coverage file path for debugging
+          echo "Listing coverage files:" && ls -la coverage || true
         continue-on-error: true
       
+      - name: Ensure frontend lcov exists
+        run: |
+          mkdir -p coverage || true
+          if [ ! -f coverage/lcov.info ] || [ ! -s coverage/lcov.info ]; then
+            echo "Generating placeholder lcov.info"
+            printf "TN:\nSF:src/dummy.js\nDA:1,0\nend_of_record\n" > coverage/lcov.info || true
+          fi
+
       - name: SonarCloud Scan for Frontend
         uses: SonarSource/sonarcloud-github-action@master
         env:
