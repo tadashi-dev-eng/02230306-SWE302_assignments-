@@ -21,14 +21,14 @@ type ProfileResponse struct {
 }
 
 // Put your response logic including wrap the userModel here.
-func (self *ProfileSerializer) Response() ProfileResponse {
-	myUserModel := self.C.MustGet("my_user_model").(UserModel)
+func (p *ProfileSerializer) Response() ProfileResponse {
+	myUserModel := p.C.MustGet("my_user_model").(UserModel)
 	profile := ProfileResponse{
-		ID:        self.ID,
-		Username:  self.Username,
-		Bio:       self.Bio,
-		Image:     self.Image,
-		Following: myUserModel.isFollowing(self.UserModel),
+		ID:        p.ID,
+		Username:  p.Username,
+		Bio:       p.Bio,
+		Image:     p.Image,
+		Following: myUserModel.isFollowing(p.UserModel),
 	}
 	return profile
 }
@@ -45,8 +45,8 @@ type UserResponse struct {
 	Token    string  `json:"token"`
 }
 
-func (self *UserSerializer) Response() UserResponse {
-	myUserModel := self.c.MustGet("my_user_model").(UserModel)
+func (u *UserSerializer) Response() UserResponse {
+	myUserModel := u.c.MustGet("my_user_model").(UserModel)
 	user := UserResponse{
 		Username: myUserModel.Username,
 		Email:    myUserModel.Email,

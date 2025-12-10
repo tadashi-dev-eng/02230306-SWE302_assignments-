@@ -23,20 +23,20 @@ type UserModelValidator struct {
 // There are some difference when you create or update a model, you need to fill the DataModel before
 // update so that you can use your origin data to cheat the validator.
 // BTW, you can put your general binding logic here such as setting password.
-func (self *UserModelValidator) Bind(c *gin.Context) error {
-	err := common.Bind(c, self)
+func (v *UserModelValidator) Bind(c *gin.Context) error {
+	err := common.Bind(c, v)
 	if err != nil {
 		return err
 	}
-	self.userModel.Username = self.User.Username
-	self.userModel.Email = self.User.Email
-	self.userModel.Bio = self.User.Bio
+	v.userModel.Username = v.User.Username
+	v.userModel.Email = v.User.Email
+	v.userModel.Bio = v.User.Bio
 
-	if self.User.Password != common.NBRandomPassword {
-		self.userModel.setPassword(self.User.Password)
+	if v.User.Password != common.NBRandomPassword {
+		v.userModel.setPassword(v.User.Password)
 	}
-	if self.User.Image != "" {
-		self.userModel.Image = &self.User.Image
+	if v.User.Image != "" {
+		v.userModel.Image = &v.User.Image
 	}
 	return nil
 }
@@ -69,13 +69,13 @@ type LoginValidator struct {
 	userModel UserModel `json:"-"`
 }
 
-func (self *LoginValidator) Bind(c *gin.Context) error {
-	err := common.Bind(c, self)
+func (lv *LoginValidator) Bind(c *gin.Context) error {
+	err := common.Bind(c, lv)
 	if err != nil {
 		return err
 	}
 
-	self.userModel.Email = self.User.Email
+	lv.userModel.Email = lv.User.Email
 	return nil
 }
 

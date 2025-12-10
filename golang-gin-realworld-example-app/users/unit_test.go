@@ -183,7 +183,7 @@ var unauthRequestTests = []struct {
 		"POST",
 		`{"user":{"email": "user112312312@linkedin.com","password": "password123"}}`,
 		http.StatusForbidden,
-		`{"errors":{"login":"Not Registered email or invalid password"}}`,
+	`{"errors":{"login":"not registered email or invalid password"}}`,
 		"email not exist should return error info",
 	},
 	{
@@ -192,7 +192,7 @@ var unauthRequestTests = []struct {
 		"POST",
 		`{"user":{"email": "user1@linkedin.com","password": "password126"}}`,
 		http.StatusForbidden,
-		`{"errors":{"login":"Not Registered email or invalid password"}}`,
+	`{"errors":{"login":"not registered email or invalid password"}}`,
 		"password error should return error info",
 	},
 	{
@@ -390,7 +390,7 @@ var unauthRequestTests = []struct {
 		"POST",
 		``,
 		http.StatusNotFound,
-		`{"errors":{"profile":"Invalid username"}}`,
+	`{"errors":{"profile":"invalid username"}}`,
 		"following wrong user name should return errors",
 	},
 	{
@@ -401,7 +401,7 @@ var unauthRequestTests = []struct {
 		"DELETE",
 		``,
 		http.StatusNotFound,
-		`{"errors":{"profile":"Invalid username"}}`,
+	`{"errors":{"profile":"invalid username"}}`,
 		"cancel following wrong user name should return errors",
 	},
 
