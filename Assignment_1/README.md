@@ -5,7 +5,7 @@ This document presents a detailed analysis of the testing implementation conduct
 
 # Backend Testing (Part A)
 
-When testing the existing test files I found [testing-analysis.md](/swe302_assignments/golang-gin-realworld-example-app/testing-analysis.md).
+When testing the existing test files I found [testing-analysis.md](/golang-gin-realworld-example-app/testing-analysis.md).
 
 ## Task 1: Articles Package Unit Tests
 
